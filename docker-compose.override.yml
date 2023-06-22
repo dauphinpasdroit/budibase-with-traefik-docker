@@ -1,0 +1,79 @@
+version: "3"
+
+services:
+
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      budibase_net: {}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  proxy-service:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.budibase-http.entrypoints: "web"
+      traefik.http.routers.budibase-http.rule: "Host(`${SUBDOMAIN_TRAEFIK}.${DOMAIN}`)"
+      traefik.http.routers.budibase-http.middlewares: "SslHeader@file"
+      traefik.http.routers.budibase-https.middlewares: "SslHeader@file"
+      traefik.http.routers.budibase-https.entrypoints: "websecure"
+      traefik.http.routers.budibase-https.rule: "Host(`${SUBDOMAIN_TRAEFIK}.${DOMAIN}`)"
+      traefik.http.routers.budibase-https.tls: "true"
+      traefik.http.routers.budibase-https.tls.certresolver: "letsencrypt"
+      traefik.http.services.budibase.loadbalancer.server.port: "${MAIN_PORT}"
+    networks:
+      budibase_net: {}
+
+  traefik:
+    image: traefik:2.6
+    restart: always
+    ports:
+      - 443:443
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yaml:/traefik.yaml:ro
+      - ./conf/:/etc/traefik/conf
+      - ./shared/:/shared
+    networks:
+      budibase_net: {}
+
+  app-service:
+    networks:
+      budibase_net: {}
+
+  worker-service:
+    networks:
+      budibase_net: {}
+
+  minio-service:
+    networks:
+      budibase_net: {}
+
+  couchdb-service:
+    networks:
+      budibase_net: {}
+
+  couch-init:
+    networks:
+      budibase_net: {}
+
+  redis-service:
+    networks:
+      budibase_net: {}
+
+  watchtower-service:
+    networks:
+      budibase_net: {}
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  budibase_net:
