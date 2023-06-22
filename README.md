@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The idea of the repository is to deploy a budibase instance, with a reverse proxy (Treafik) and an automatically generated certificate to use 443 and TLS.
+The idea behind this repository is to deploy a budibase instance with a reverse proxy (Treafik) and an automatically generated certificate, in order to expose over 443 and TLS.
 
 The certificate will be automatically generated using Let's Encrypt.
 
@@ -50,7 +50,7 @@ You'll have to add the label in the ``proxy-service``:
 - ``traefik.http.routers.budibase-https.tls.certresolver: "letsencrypt"`` : Declare the certificate resolver, here letsencrypt.
 - ``traefik.http.services.budibase.loadbalancer.server.port: "${MAIN_PORT}"`` : Setup the port access of the docker. 
 
-The Traefik container is setup with the code:
+The Traefik container is setup with the following code:
 
 ```
   traefik:
@@ -69,6 +69,6 @@ The Traefik container is setup with the code:
 
 ```
 
-The volume are setup to take the conf needed by traefik.
+The volumes are setup to take the conf needed by traefik.
 
-The `conf` folder, with the files `headers.yml`and `tls.yaml`, is the configuration of Traefik. The file `traefik.yaml`as well.
+The `conf` folder, with the files `headers.yml`and `tls.yaml`, is the Traefic configuration, and also the `traefik.yaml` file.
